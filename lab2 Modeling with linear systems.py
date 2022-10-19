@@ -11,6 +11,7 @@ from scipy.integrate import odeint
 from scipy.signal import tf2ss
 from scipy.signal import ss2tf
 from scipy.signal import bessel, lsim2
+from scipy.signal import lti
 
 def zadanie2():
     #2.1
@@ -125,42 +126,66 @@ def zadanie3():
     text2 = print('zad 3.3/3.4: Niestety nie. Macierze mają takie same wartoci ale w innych komórkach, natomiast den1 się zgadza ale num1 już nie (wartoci są w wierszach a powinny być w kolumnach)')
     return(plt1,plt2,plt3,plt4,text1,ss,tf,text2)
 
-#zadanie2()
-#zadanie3()
+def zadanie4():
+    #parameters
+    m = 1
+    L = 0.5
+    d = 0.1
+    J = 1/3*m*L**2
+    #4.1 State-space model
+    A3 = np.matrix([[0,1],[0,-d/J]])
+    B3 = np.matrix([[0],[1/J]])
+    C3 = np.matrix([[1,0]])
+    D3 = 0
+    texts =  print('4.1: Równania stanu: ',A3,B3,C3,D3)
+    
+    #4.2
+    sys2 = signal.StateSpace(A3,B3,C3,D3)
+    t4, y4 = signal.step(sys2)
+    plt.figure(7)
+    plt5 = plt.plot(t4, y4)
+    plt.xlabel('time')
+    plt.ylabel('y(t)')
+    plt.title( '4.2 manipulator')
+    plt.grid()
+    # Jaki jest charakter odpowiedzi skokowej obiektu?
+    text3 = print('4.2: Jest to charakter całkujący rzeczywisty')
+    
+    #4.3
+    A3 = np.array([[0,1],[0,-d/J]])
+    B3 = np.array([[0],[1/J]])
+    C3 = np.array([[1,0]])
+    D3 = 0 
+    u_up = np.arange(0, 50+1, 1)
+    u_down =np.arange(1, -50, -1)
+    t5 = np.arange(0, 51, 1)
+    # narastający
+    system = lti(A3, B3, C3, D3)
+    tout, y6, x6 = lsim2(system, u_up, t5)
+    plt.figure(8)
+    plt.title('4.3 liniowo narastający')
+    plt6 = plt.plot(t5, y6)
+    plt.xlabel('t')
+    plt.grid()
+    #opadający
+    tout, y7, x7 = lsim2(system, u_down, t5)
+    plt.figure(9)
+    plt.title('4.3 liniowo odpadający')
+    plt7 = plt.plot(t5, y7)
+    plt.xlabel('t')
+    plt.grid()
+    #4.4
+    w, mag, phase = signal.bode(sys2)
+    plt.figure(10)
+    plt.title('4.4 Bode magnitude plot')
+    plt8 =  plt.semilogx(w, mag)
+    plt.grid()    # Bode magnitude plot
+    plt.figure(11)
+    plt.title('4.4 Bode phase plot')
+    plt9 = plt.semilogx(w, phase)  # Bode phase plot
+    plt.grid()
+    return(texts, A3, B3, C3,D3 , plt5, text3, plt6, plt7, plt8, plt9)
 
-#parameters
-m = 1
-L = 0.5
-d = 0.1
-J = 1/3*m*L**2
-#4.1 State-space model
-A3 = np.matrix([[0,1],[0,-d/J]])
-B3 = np.matrix([[0],[1/J]])
-C3 = np.matrix([[1,0]])
-D3 = 0
-
-#4.2
-sys2 = signal.StateSpace(A3,B3,C3,D3)
-t4, y4 = signal.step(sys2)
-plt.figure(7)
-plt5 = plt.plot(t4, y4)
-plt.xlabel('time')
-plt.ylabel('y(t)')
-plt.title( '4.2 manipulator')
-plt.grid()
-# Jaki jest charakter odpowiedzi skokowej obiektu?
-text3 = print('4.2: Jest to charakter całkujący rzeczywisty')
-
-#4.3 
-
-#4.4
-w, mag, phase = signal.bode(sys2)
-plt.figure(8)
-plt.title('4.4 Bode magnitude plot')
-plt.semilogx(w, mag)
-plt.grid()    # Bode magnitude plot
-plt.figure(9)
-plt.title('4.4 Bode phase plot')
-plt.semilogx(w, phase)  # Bode phase plot
-plt.grid()
-
+zadanie2()
+zadanie3()
+zadanie4()
